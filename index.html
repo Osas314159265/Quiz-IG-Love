@@ -1,438 +1,351 @@
-import React, { useState } from 'react';
-import { User, ShieldAlert, CheckCircle, XCircle, ArrowRight, RotateCcw, Award } from 'lucide-react';
-
-// ข้อมูลแบบทดสอบ
-const quizData = [
-  {
-    id: 1,
-    question: 'นลินรู้จักเควินผ่านช่องทางใด',
-    options: ['ก. Facebook', 'ข. TikTok', 'ค. Instagram', 'ง. LINE'],
-    answerIndex: 2,
-  },
-  {
-    id: 2,
-    question: 'สิ่งใดเป็นสัญญาณเตือนแรกที่นลินควรสังเกต',
-    options: [
-      'ก. เควินทักทายทุกวัน',
-      'ข. เควินเป็นวิศวกร',
-      'ค. เควินไม่เคยวิดีโอคอลเลย',
-      'ง. เควินพูดภาษาอังกฤษได้',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 3,
-    question: 'ข้อใดเป็นวิธีที่มิจฉาชีพใช้สร้างความไว้วางใจจากเหยื่อ',
-    options: [
-      'ก. ข่มขู่ทันที',
-      'ข. ส่งข้อความหวานและเอาใจใส่อย่างต่อเนื่อง',
-      'ค. ขอเงินตั้งแต่วันแรก',
-      'ง. ด่าทอเหยื่อ',
-    ],
-    answerIndex: 1,
-  },
-  {
-    id: 4,
-    question: 'เหตุผลที่เควินอ้างเพื่อขอเงินคืออะไร',
-    options: [
-      'ก. ต้องการซื้อรถใหม่',
-      'ข. ต้องการลงทุนหุ้น',
-      'ค. ต้องการค่าธรรมเนียมปล่อยตู้คอนเทนเนอร์',
-      'ง. ต้องการซื้อบ้าน',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 5,
-    question: 'โรแมนสแกม (Romance Scam) คืออะไร',
-    options: [
-      'ก. การขายสินค้าออนไลน์',
-      'ข. การหลอกให้รักเพื่อหวังผลประโยชน์หรือเงิน',
-      'ค. การแฮกบัญชีธนาคาร',
-      'ง. การส่งไวรัสคอมพิวเตอร์',
-    ],
-    answerIndex: 1,
-  },
-  {
-    id: 6,
-    question: 'หากคนรู้จักทางออนไลน์ขอเงินด่วน นักเรียนควรทำอย่างไร',
-    options: [
-      'ก. โอนให้ทันที',
-      'ข. ยืมเงินคนอื่นมาโอน',
-      'ค. ตรวจสอบข้อมูลและปรึกษาผู้ปกครองก่อน',
-      'ง. ส่งรหัสผ่านให้ด้วย',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 7,
-    question: 'ข้อใดไม่ควรเปิดเผยให้คนแปลกหน้าบนอินเทอร์เน็ต',
-    options: [
-      'ก. ชื่อเล่น',
-      'ข. สีที่ชอบ',
-      'ค. รหัสผ่านและข้อมูลธนาคาร',
-      'ง. งานอดิเรก',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 8,
-    question: 'หากมีคนอ้างว่าเป็นชาวต่างชาติร่ำรวย แต่ขอให้โอนเงินช่วยเหลือ ควรคิดอย่างไร',
-    options: [
-      'ก. น่าเชื่อถือแน่นอน',
-      'ข. อาจเป็นมิจฉาชีพ ต้องตรวจสอบก่อน',
-      'ค. ควรรีบช่วยทันที',
-      'ง. เป็นเรื่องปกติ',
-    ],
-    answerIndex: 1,
-  },
-  {
-    id: 9,
-    question: 'ข้อใดเป็นวิธีตรวจสอบตัวตนของคนที่รู้จักทางออนไลน์',
-    options: [
-      'ก. เชื่อจากรูปโปรไฟล์อย่างเดียว',
-      'ข. เชื่อจากจำนวนผู้ติดตาม',
-      'ค. วิดีโอคอลหรือหาหลักฐานยืนยันตัวตน',
-      'ง. เชื่อทุกอย่างที่อีกฝ่ายบอก',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 10,
-    question: 'มิจฉาชีพมักใช้วิธีใดเพื่อให้เหยื่อตัดสินใจเร็ว',
-    options: [
-      'ก. ให้เวลาคิดหลายเดือน',
-      'ข. สร้างสถานการณ์เร่งด่วน',
-      'ค. ส่งของขวัญจริงมาให้',
-      'ง. พาไปพบครอบครัว',
-    ],
-    answerIndex: 1,
-  },
-  {
-    id: 11,
-    question: 'หากพบว่าถูกหลอกโอนเงินแล้ว ควรทำสิ่งใดเป็นอันดับแรก',
-    options: [
-      'ก. ลบบัญชีผู้ใช้ของตน',
-      'ข. เก็บหลักฐานการสนทนาและแจ้งธนาคารทันที',
-      'ค. ปิดโทรศัพท์',
-      'ง. ไม่ต้องทำอะไร',
-    ],
-    answerIndex: 1,
-  },
-  {
-    id: 12,
-    question: 'ข้อใดเป็นพฤติกรรมการใช้อินเทอร์เน็ตที่ปลอดภัยที่สุด',
-    options: [
-      'ก. รับเพื่อนทุกคนที่ส่งคำขอมา',
-      'ข. คลิกลิงก์ทุกลิงก์ที่ได้รับ',
-      'ค. ใช้รหัสผ่านเดียวทุกบัญชี',
-      'ง. ตั้งค่าความเป็นส่วนตัวและระมัดระวังคนแปลกหน้า',
-    ],
-    answerIndex: 3,
-  },
-  {
-    id: 13,
-    question: 'การใช้รหัสผ่านที่ปลอดภัยควรเป็นอย่างไร',
-    options: [
-      'ก. 123456',
-      'ข. วันเดือนปีเกิด',
-      'ค. มีตัวอักษร ตัวเลข และสัญลักษณ์ผสมกัน',
-      'ง. ใช้คำว่า password',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 14,
-    question: 'หากมีข้อความแจ้งว่า "คุณได้รับรางวัลใหญ่ คลิกลิงก์ทันที" ควรทำอย่างไร',
-    options: [
-      'ก. คลิกลิงก์ทันที',
-      'ข. ส่งต่อให้เพื่อน',
-      'ค. ตรวจสอบแหล่งที่มาและไม่รีบกดลิงก์',
-      'ง. กรอกข้อมูลส่วนตัวก่อน',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 15,
-    question: 'ข้อคิดสำคัญที่สุดจากเรื่องนี้คืออะไร',
-    options: [
-      'ก. ไม่ควรใช้อินเทอร์เน็ตเลย',
-      'ข. ควรเชื่อคนที่พูดเพราะ',
-      'ค. ควรระมัดระวังและตรวจสอบข้อมูลก่อนเชื่อหรือโอนเงิน',
-      'ง. คนในโลกออนไลน์ทุกคนเป็นมิตร',
-    ],
-    answerIndex: 2,
-  },
-  {
-    id: 16,
-    question: '(คำถามโบนัส) หากเพื่อนออนไลน์ที่ไม่เคยพบตัวจริงบอกว่าจะส่งโทรศัพท์ราคาแพงมาให้ แต่ต้องจ่ายค่าดำเนินการ 5,000 บาทก่อน นักเรียนควรทำอย่างไร',
-    options: [
-      'ก. รีบโอนเงิน',
-      'ข. ขอส่วนลด',
-      'ค. ปฏิเสธและแจ้งผู้ปกครองหรือครู',
-      'ง. โอนเงินครึ่งหนึ่งก่อน',
-    ],
-    answerIndex: 2,
-  },
-];
-
-export default function App() {
-  const [step, setStep] = useState('login'); // 'login', 'quiz', 'result'
-  const [studentName, setStudentName] = useState('');
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState(Array(quizData.length).fill(null));
-  const [errorMsg, setErrorMsg] = useState('');
-
-  const handleStart = (e) => {
-    e.preventDefault();
-    if (studentName.trim().length < 3) {
-      setErrorMsg('กรุณากรอกชื่อและนามสกุลให้ครบถ้วน');
-      return;
-    }
-    setErrorMsg('');
-    setStep('quiz');
-  };
-
-  const handleSelectOption = (optionIndex) => {
-    const newAnswers = [...userAnswers];
-    newAnswers[currentQuestionIndex] = optionIndex;
-    setUserAnswers(newAnswers);
-  };
-
-  const handleNext = () => {
-    if (userAnswers[currentQuestionIndex] === null) {
-      setErrorMsg('กรุณาเลือกคำตอบก่อนไปข้อถัดไป');
-      return;
-    }
-    setErrorMsg('');
-
-    if (currentQuestionIndex < quizData.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      setStep('result');
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setErrorMsg('');
-    }
-  };
-
-  const calculateScore = () => {
-    let score = 0;
-    userAnswers.forEach((ans, index) => {
-      if (ans === quizData[index].answerIndex) {
-        score += 1;
-      }
-    });
-    return score;
-  };
-
-  const restartQuiz = () => {
-    setStep('login');
-    setStudentName('');
-    setCurrentQuestionIndex(0);
-    setUserAnswers(Array(quizData.length).fill(null));
-    setErrorMsg('');
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 font-sans text-slate-800">
-      <div className="max-w-2xl mx-auto">
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบความตระหนักภัยออนไลน์: สุดที่รักจากไอจี</title>
+    <!-- โหลด Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- โหลด Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .hidden-step {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 py-8 px-4 text-slate-800">
+    <div class="max-w-2xl mx-auto">
         
-        {/* Header */}
-        <header className="text-center mb-8">
-          <div className="inline-flex items-center justify-center p-3 bg-red-100 rounded-full mb-4 text-red-600">
-            <ShieldAlert size={36} />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">แบบทดสอบความตระหนักภัยออนไลน์</h1>
-          <p className="text-lg text-slate-600">เรื่อง "สุดที่รักจากไอจี"</p>
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center justify-center p-3 bg-red-100 rounded-full mb-4 text-red-600">
+                <i data-lucide="shield-alert" class="w-9 h-9"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">แบบทดสอบความตระหนักภัยออนไลน์</h1>
+            <p class="text-lg text-slate-600">เรื่อง "สุดที่รักจากไอจี"</p>
         </header>
 
-        {/* --------- STEP 1: LOGIN --------- */}
-        {step === 'login' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
-            <h2 className="text-xl font-semibold mb-6 text-center">ลงทะเบียนก่อนทำแบบทดสอบ</h2>
-            <form onSubmit={handleStart} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="name">
-                  ชื่อ - นามสกุล นักเรียน
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User size={18} className="text-slate-400" />
-                  </div>
-                  <input
-                    type="text"
-                    id="name"
-                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="ด.ช. / ด.ญ. / นาย / นางสาว..."
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                  />
-                </div>
-                {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
-              </div>
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
-              >
-                เริ่มทำแบบทดสอบ <ArrowRight size={18} className="ml-2" />
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* --------- STEP 2: QUIZ --------- */}
-        {step === 'quiz' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="flex justify-between text-sm font-medium text-slate-500 mb-2">
-                <span>ผู้ทำสอบ: {studentName}</span>
-                <span>ข้อที่ {currentQuestionIndex + 1} / {quizData.length}</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2.5">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Question */}
-            <div className="mb-8">
-              <h2 className="text-xl md:text-2xl font-semibold text-slate-800 leading-relaxed">
-                {currentQuestionIndex + 1}. {quizData[currentQuestionIndex].question}
-              </h2>
-            </div>
-
-            {/* Options */}
-            <div className="space-y-3 mb-8">
-              {quizData[currentQuestionIndex].options.map((option, index) => {
-                const isSelected = userAnswers[currentQuestionIndex] === index;
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleSelectOption(index)}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-600 bg-blue-50 text-blue-900'
-                        : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                        isSelected ? 'border-blue-600' : 'border-slate-400'
-                      }`}>
-                        {isSelected && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
-                      </div>
-                      <span className="text-base md:text-lg">{option}</span>
+        <!-- --------- STEP 1: LOGIN --------- -->
+        <div id="step-login" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+            <h2 class="text-xl font-semibold mb-6 text-center">ลงทะเบียนก่อนทำแบบทดสอบ</h2>
+            <form id="login-form" onsubmit="handleStart(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2" for="name">
+                        ชื่อ - นามสกุล นักเรียน
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                        <input
+                            type="text"
+                            id="student-name"
+                            class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
+                            placeholder="ด.ช. / ด.ญ. / นาย / นางสาว..."
+                        />
                     </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {errorMsg && <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className={`px-5 py-2.5 rounded-lg font-medium transition-colors ${
-                  currentQuestionIndex === 0
-                    ? 'text-slate-300 cursor-not-allowed'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                ย้อนกลับ
-              </button>
-              <button
-                onClick={handleNext}
-                className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
-              >
-                {currentQuestionIndex === quizData.length - 1 ? 'ส่งคำตอบ' : 'ข้อต่อไป'} 
-                {currentQuestionIndex !== quizData.length - 1 && <ArrowRight size={18} className="ml-2" />}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* --------- STEP 3: RESULT --------- */}
-        {step === 'result' && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center p-4 bg-green-100 rounded-full mb-4 text-green-600">
-                <Award size={48} />
-              </div>
-              <h2 className="text-3xl font-bold mb-2 text-slate-800">สรุปผลคะแนน</h2>
-              <p className="text-lg text-slate-600 mb-6">ผู้ทำสอบ: <span className="font-semibold text-slate-800">{studentName}</span></p>
-              
-              <div className="bg-slate-50 rounded-2xl p-6 inline-block min-w-[200px] border border-slate-100 shadow-inner">
-                <div className="text-5xl font-black text-blue-600 mb-2">
-                  {calculateScore()} <span className="text-2xl text-slate-400">/ {quizData.length}</span>
+                    <p id="login-error" class="text-red-500 text-sm mt-2 hidden">กรุณากรอกชื่อและนามสกุลให้ครบถ้วน</p>
                 </div>
-                <p className="text-slate-500 font-medium">คะแนนที่ได้</p>
-              </div>
+                <button
+                    type="submit"
+                    class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
+                >
+                    เริ่มทำแบบทดสอบ <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- --------- STEP 2: QUIZ --------- -->
+        <div id="step-quiz" class="hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+            <!-- Progress Bar -->
+            <div class="mb-8">
+                <div class="flex justify-between text-sm font-medium text-slate-500 mb-2">
+                    <span>ผู้ทำสอบ: <span id="display-name" class="text-slate-800"></span></span>
+                    <span id="quiz-progress-text">ข้อที่ 1 / 16</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                    <div id="quiz-progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                </div>
             </div>
 
-            {/* Answer Review */}
-            <div className="mt-8 pt-8 border-t border-slate-200">
-              <h3 className="text-xl font-bold mb-6 text-slate-800">ทบทวนคำตอบ</h3>
-              <div className="space-y-6">
-                {quizData.map((item, index) => {
-                  const userAnswer = userAnswers[index];
-                  const isCorrect = userAnswer === item.answerIndex;
+            <!-- Question -->
+            <div class="mb-8">
+                <h2 id="question-text" class="text-xl md:text-2xl font-semibold text-slate-800 leading-relaxed">
+                    <!-- Question will be injected here -->
+                </h2>
+            </div>
 
-                  return (
-                    <div key={index} className={`p-5 rounded-xl border ${isCorrect ? 'bg-green-50/50 border-green-100' : 'bg-red-50/50 border-red-100'}`}>
-                      <div className="flex gap-3 mb-3">
-                        <div className="mt-1 flex-shrink-0">
-                          {isCorrect ? (
-                            <CheckCircle className="text-green-500" size={24} />
-                          ) : (
-                            <XCircle className="text-red-500" size={24} />
-                          )}
+            <!-- Options -->
+            <div id="options-container" class="space-y-3 mb-8">
+                <!-- Options will be injected here -->
+            </div>
+
+            <p id="quiz-error" class="text-red-500 text-sm mb-4 text-center hidden">กรุณาเลือกคำตอบก่อนไปข้อถัดไป</p>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between pt-4 border-t border-slate-100">
+                <button
+                    id="btn-prev"
+                    onclick="handlePrevious()"
+                    class="px-5 py-2.5 rounded-lg font-medium transition-colors text-slate-600 hover:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                >
+                    ย้อนกลับ
+                </button>
+                <button
+                    id="btn-next"
+                    onclick="handleNext()"
+                    class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
+                >
+                    <span id="btn-next-text">ข้อต่อไป</span> 
+                    <i id="btn-next-icon" data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- --------- STEP 3: RESULT --------- -->
+        <div id="step-result" class="hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center p-4 bg-green-100 rounded-full mb-4 text-green-600">
+                    <i data-lucide="award" class="w-12 h-12"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-2 text-slate-800">สรุปผลคะแนน</h2>
+                <p class="text-lg text-slate-600 mb-6">ผู้ทำสอบ: <span id="result-name" class="font-semibold text-slate-800"></span></p>
+                
+                <div class="bg-slate-50 rounded-2xl p-6 inline-block min-w-[200px] border border-slate-100 shadow-inner">
+                    <div class="text-5xl font-black text-blue-600 mb-2">
+                        <span id="final-score">0</span> <span class="text-2xl text-slate-400" id="total-score">/ 16</span>
+                    </div>
+                    <p class="text-slate-500 font-medium">คะแนนที่ได้</p>
+                </div>
+            </div>
+
+            <!-- Answer Review -->
+            <div class="mt-8 pt-8 border-t border-slate-200">
+                <h3 class="text-xl font-bold mb-6 text-slate-800">ทบทวนคำตอบ</h3>
+                <div id="review-container" class="space-y-6">
+                    <!-- Review items will be injected here -->
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-center">
+                <button
+                    onclick="restartQuiz()"
+                    class="flex items-center bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200"
+                >
+                    <i data-lucide="rotate-ccw" class="w-5 h-5 mr-2"></i> ทำแบบทดสอบอีกครั้ง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // ข้อมูลแบบทดสอบ
+        const quizData = [
+            { question: 'นลินรู้จักเควินผ่านช่องทางใด', options: ['ก. Facebook', 'ข. TikTok', 'ค. Instagram', 'ง. LINE'], answerIndex: 2 },
+            { question: 'สิ่งใดเป็นสัญญาณเตือนแรกที่นลินควรสังเกต', options: ['ก. เควินทักทายทุกวัน', 'ข. เควินเป็นวิศวกร', 'ค. เควินไม่เคยวิดีโอคอลเลย', 'ง. เควินพูดภาษาอังกฤษได้'], answerIndex: 2 },
+            { question: 'ข้อใดเป็นวิธีที่มิจฉาชีพใช้สร้างความไว้วางใจจากเหยื่อ', options: ['ก. ข่มขู่ทันที', 'ข. ส่งข้อความหวานและเอาใจใส่อย่างต่อเนื่อง', 'ค. ขอเงินตั้งแต่วันแรก', 'ง. ด่าทอเหยื่อ'], answerIndex: 1 },
+            { question: 'เหตุผลที่เควินอ้างเพื่อขอเงินคืออะไร', options: ['ก. ต้องการซื้อรถใหม่', 'ข. ต้องการลงทุนหุ้น', 'ค. ต้องการค่าธรรมเนียมปล่อยตู้คอนเทนเนอร์', 'ง. ต้องการซื้อบ้าน'], answerIndex: 2 },
+            { question: 'โรแมนสแกม (Romance Scam) คืออะไร', options: ['ก. การขายสินค้าออนไลน์', 'ข. การหลอกให้รักเพื่อหวังผลประโยชน์หรือเงิน', 'ค. การแฮกบัญชีธนาคาร', 'ง. การส่งไวรัสคอมพิวเตอร์'], answerIndex: 1 },
+            { question: 'หากคนรู้จักทางออนไลน์ขอเงินด่วน นักเรียนควรทำอย่างไร', options: ['ก. โอนให้ทันที', 'ข. ยืมเงินคนอื่นมาโอน', 'ค. ตรวจสอบข้อมูลและปรึกษาผู้ปกครองก่อน', 'ง. ส่งรหัสผ่านให้ด้วย'], answerIndex: 2 },
+            { question: 'ข้อใดไม่ควรเปิดเผยให้คนแปลกหน้าบนอินเทอร์เน็ต', options: ['ก. ชื่อเล่น', 'ข. สีที่ชอบ', 'ค. รหัสผ่านและข้อมูลธนาคาร', 'ง. งานอดิเรก'], answerIndex: 2 },
+            { question: 'หากมีคนอ้างว่าเป็นชาวต่างชาติร่ำรวย แต่ขอให้โอนเงินช่วยเหลือ ควรคิดอย่างไร', options: ['ก. น่าเชื่อถือแน่นอน', 'ข. อาจเป็นมิจฉาชีพ ต้องตรวจสอบก่อน', 'ค. ควรรีบช่วยทันที', 'ง. เป็นเรื่องปกติ'], answerIndex: 1 },
+            { question: 'ข้อใดเป็นวิธีตรวจสอบตัวตนของคนที่รู้จักทางออนไลน์', options: ['ก. เชื่อจากรูปโปรไฟล์อย่างเดียว', 'ข. เชื่อจากจำนวนผู้ติดตาม', 'ค. วิดีโอคอลหรือหาหลักฐานยืนยันตัวตน', 'ง. เชื่อทุกอย่างที่อีกฝ่ายบอก'], answerIndex: 2 },
+            { question: 'มิจฉาชีพมักใช้วิธีใดเพื่อให้เหยื่อตัดสินใจเร็ว', options: ['ก. ให้เวลาคิดหลายเดือน', 'ข. สร้างสถานการณ์เร่งด่วน', 'ค. ส่งของขวัญจริงมาให้', 'ง. พาไปพบครอบครัว'], answerIndex: 1 },
+            { question: 'หากพบว่าถูกหลอกโอนเงินแล้ว ควรทำสิ่งใดเป็นอันดับแรก', options: ['ก. ลบบัญชีผู้ใช้ของตน', 'ข. เก็บหลักฐานการสนทนาและแจ้งธนาคารทันที', 'ค. ปิดโทรศัพท์', 'ง. ไม่ต้องทำอะไร'], answerIndex: 1 },
+            { question: 'ข้อใดเป็นพฤติกรรมการใช้อินเทอร์เน็ตที่ปลอดภัยที่สุด', options: ['ก. รับเพื่อนทุกคนที่ส่งคำขอมา', 'ข. คลิกลิงก์ทุกลิงก์ที่ได้รับ', 'ค. ใช้รหัสผ่านเดียวทุกบัญชี', 'ง. ตั้งค่าความเป็นส่วนตัวและระมัดระวังคนแปลกหน้า'], answerIndex: 3 },
+            { question: 'การใช้รหัสผ่านที่ปลอดภัยควรเป็นอย่างไร', options: ['ก. 123456', 'ข. วันเดือนปีเกิด', 'ค. มีตัวอักษร ตัวเลข และสัญลักษณ์ผสมกัน', 'ง. ใช้คำว่า password'], answerIndex: 2 },
+            { question: 'หากมีข้อความแจ้งว่า "คุณได้รับรางวัลใหญ่ คลิกลิงก์ทันที" ควรทำอย่างไร', options: ['ก. คลิกลิงก์ทันที', 'ข. ส่งต่อให้เพื่อน', 'ค. ตรวจสอบแหล่งที่มาและไม่รีบกดลิงก์', 'ง. กรอกข้อมูลส่วนตัวก่อน'], answerIndex: 2 },
+            { question: 'ข้อคิดสำคัญที่สุดจากเรื่องนี้คืออะไร', options: ['ก. ไม่ควรใช้อินเทอร์เน็ตเลย', 'ข. ควรเชื่อคนที่พูดเพราะ', 'ค. ควรระมัดระวังและตรวจสอบข้อมูลก่อนเชื่อหรือโอนเงิน', 'ง. คนในโลกออนไลน์ทุกคนเป็นมิตร'], answerIndex: 2 },
+            { question: '(คำถามโบนัส) หากเพื่อนออนไลน์ที่ไม่เคยพบตัวจริงบอกว่าจะส่งโทรศัพท์ราคาแพงมาให้ แต่ต้องจ่ายค่าดำเนินการ 5,000 บาทก่อน นักเรียนควรทำอย่างไร', options: ['ก. รีบโอนเงิน', 'ข. ขอส่วนลด', 'ค. ปฏิเสธและแจ้งผู้ปกครองหรือครู', 'ง. โอนเงินครึ่งหนึ่งก่อน'], answerIndex: 2 },
+        ];
+
+        // State variables
+        let studentName = '';
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+
+        // Initialize icons
+        lucide.createIcons();
+
+        // View management
+        function showStep(stepId) {
+            document.getElementById('step-login').classList.add('hidden-step');
+            document.getElementById('step-quiz').classList.add('hidden-step');
+            document.getElementById('step-result').classList.add('hidden-step');
+            document.getElementById(stepId).classList.remove('hidden-step');
+        }
+
+        // Action Handlers
+        function handleStart(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('student-name').value;
+            const errorMsg = document.getElementById('login-error');
+
+            if (nameInput.trim().length < 3) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            studentName = nameInput.trim();
+            document.getElementById('display-name').textContent = studentName;
+            document.getElementById('result-name').textContent = studentName;
+            document.getElementById('total-score').textContent = `/ ${quizData.length}`;
+            
+            showStep('step-quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const questionData = quizData[currentQuestionIndex];
+            
+            // Update Progress
+            document.getElementById('quiz-progress-text').textContent = `ข้อที่ ${currentQuestionIndex + 1} / ${quizData.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+
+            // Update Question Text
+            document.getElementById('question-text').textContent = `${currentQuestionIndex + 1}. ${questionData.question}`;
+
+            // Update Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            questionData.options.forEach((option, index) => {
+                const isSelected = userAnswers[currentQuestionIndex] === index;
+                const btn = document.createElement('button');
+                
+                btn.onclick = () => selectOption(index);
+                btn.className = `w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
+                    isSelected 
+                    ? 'border-blue-600 bg-blue-50 text-blue-900' 
+                    : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50 text-slate-700'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center pointer-events-none">
+                        <div class="w-5 h-5 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${isSelected ? 'border-blue-600' : 'border-slate-400'}">
+                            ${isSelected ? '<div class="w-2.5 h-2.5 bg-blue-600 rounded-full"></div>' : ''}
+                        </div>
+                        <span class="text-base md:text-lg">${option}</span>
+                    </div>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Update Navigation Buttons
+            const btnPrev = document.getElementById('btn-prev');
+            btnPrev.disabled = currentQuestionIndex === 0;
+
+            const btnNextText = document.getElementById('btn-next-text');
+            const btnNextIcon = document.getElementById('btn-next-icon');
+            if (currentQuestionIndex === quizData.length - 1) {
+                btnNextText.textContent = 'ส่งคำตอบ';
+                btnNextIcon.classList.add('hidden');
+            } else {
+                btnNextText.textContent = 'ข้อต่อไป';
+                btnNextIcon.classList.remove('hidden');
+            }
+
+            document.getElementById('quiz-error').classList.add('hidden');
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestionIndex] = index;
+            renderQuestion(); // Re-render to show selection
+        }
+
+        function handleNext() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                document.getElementById('quiz-error').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('quiz-error').classList.add('hidden');
+
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                renderResult();
+            }
+        }
+
+        function handlePrevious() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                document.getElementById('quiz-error').classList.add('hidden');
+                renderQuestion();
+            }
+        }
+
+        function renderResult() {
+            // Calculate Score
+            let score = 0;
+            userAnswers.forEach((ans, index) => {
+                if (ans === quizData[index].answerIndex) score++;
+            });
+            document.getElementById('final-score').textContent = score;
+
+            // Generate Review Items
+            const reviewContainer = document.getElementById('review-container');
+            reviewContainer.innerHTML = '';
+
+            quizData.forEach((item, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === item.answerIndex;
+
+                const reviewDiv = document.createElement('div');
+                reviewDiv.className = `p-5 rounded-xl border ${isCorrect ? 'bg-green-50/50 border-green-100' : 'bg-red-50/50 border-red-100'}`;
+                
+                reviewDiv.innerHTML = `
+                    <div class="flex gap-3 mb-3">
+                        <div class="mt-1 flex-shrink-0">
+                            ${isCorrect 
+                                ? `<i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>` 
+                                : `<i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>`
+                            }
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-800 mb-1">
-                            {index + 1}. {item.question}
-                          </p>
-                          <div className="text-sm space-y-1">
-                            <p className={isCorrect ? 'text-green-700 font-medium' : 'text-red-600 line-through opacity-70'}>
-                              <span className="text-slate-500 mr-2">คุณตอบ:</span>
-                              {userAnswer !== null ? item.options[userAnswer] : 'ไม่ได้ตอบ'}
+                            <p class="font-semibold text-slate-800 mb-1">
+                                ${index + 1}. ${item.question}
                             </p>
-                            {!isCorrect && (
-                              <p className="text-green-700 font-medium">
-                                <span className="text-slate-500 mr-2">เฉลย:</span>
-                                {item.options[item.answerIndex]}
-                              </p>
-                            )}
-                          </div>
+                            <div class="text-sm space-y-1">
+                                <p class="${isCorrect ? 'text-green-700 font-medium' : 'text-red-600 line-through opacity-70'}">
+                                    <span class="text-slate-500 mr-2">คุณตอบ:</span>
+                                    ${userAnswer !== null ? item.options[userAnswer] : 'ไม่ได้ตอบ'}
+                                </p>
+                                ${!isCorrect ? `
+                                    <p class="text-green-700 font-medium">
+                                        <span class="text-slate-500 mr-2">เฉลย:</span>
+                                        ${item.options[item.answerIndex]}
+                                    </p>
+                                ` : ''}
+                            </div>
                         </div>
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                `;
+                reviewContainer.appendChild(reviewDiv);
+            });
 
-            <div className="mt-10 flex justify-center">
-              <button
-                onClick={restartQuiz}
-                className="flex items-center bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200"
-              >
-                <RotateCcw size={18} className="mr-2" /> ทำแบบทดสอบอีกครั้ง
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+            // Re-initialize icons for newly added elements
+            lucide.createIcons();
+            
+            showStep('step-result');
+        }
+
+        function restartQuiz() {
+            studentName = '';
+            document.getElementById('student-name').value = '';
+            currentQuestionIndex = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            
+            showStep('step-login');
+        }
+    </script>
+</body>
+</html>
